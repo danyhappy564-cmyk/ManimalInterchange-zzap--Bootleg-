@@ -12,6 +12,7 @@ internal static class AreaLightBindings
 {
     private static readonly Dictionary<int, Scope> Scopes = new();
     private static readonly HashSet<string> ProbePaths = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly HashSet<int> ForeignScenes = new();
     private sealed class PathScope : IDisposable
     {
         private readonly string _path;
@@ -21,6 +22,7 @@ internal static class AreaLightBindings
     internal static IDisposable ClaimProbePath(string path)
     {
         if (string.IsNullOrEmpty(path) || !ProbePaths.Add(path)) throw new InvalidOperationException("Duplicate or empty area-light probe path");
+        ForeignScenes.Clear();
         return new PathScope(path);
     }
 
@@ -64,7 +66,16 @@ internal static class AreaLightBindings
         var scene = light.gameObject.scene;
         if (!Scopes.TryGetValue(scene.handle, out var scope))
         {
-            if (!SceneLoader.Owns(scene.path) && !ProbePaths.Contains(scene.path)) return;
+            // zzap: AreaLight.Init runs every frame for every area light (Labs: ~140 lights, ~800k calls a minute) and
+            // Scene.path allocates a new string on each read - 220-250 MB a minute of garbage on Labs. A scene found
+            // foreign once stays foreign: owned paths are registered before their scenes load.
+            if (ForeignScenes.Contains(scene.handle)) return;
+            var path = scene.path;
+            if (!SceneLoader.Owns(path) && !ProbePaths.Contains(path))
+            {
+                ForeignScenes.Add(scene.handle);
+                return;
+            }
             scope = ClaimScene(scene);
         }
         light.m_ProxyShader = scope.Proxy;
@@ -76,6 +87,7 @@ internal static class AreaLightBindings
 
     internal static void SceneUnloaded(Scene scene)
     {
+        ForeignScenes.Remove(scene.handle);
         if (Scopes.TryGetValue(scene.handle, out var scope)) scope.Dispose();
     }
 }

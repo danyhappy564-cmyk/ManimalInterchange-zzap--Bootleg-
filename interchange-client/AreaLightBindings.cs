@@ -63,6 +63,8 @@ internal static class AreaLightBindings
 
     internal static void BeforeInit(AreaLight light)
     {
+        // zzap: outside an Interchange raid nothing can match, so skip the native gameObject/scene lookups too.
+        if (Scopes.Count == 0 && ProbePaths.Count == 0 && !SceneLoader.OwnsAny) return;
         var scene = light.gameObject.scene;
         if (!Scopes.TryGetValue(scene.handle, out var scope))
         {

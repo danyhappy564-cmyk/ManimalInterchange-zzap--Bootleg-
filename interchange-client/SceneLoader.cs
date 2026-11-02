@@ -27,6 +27,7 @@ internal static class SceneLoader
     private static bool _cleaning;
     private static CancellationToken _loadingToken;
     internal static bool Owns(string path) => ScenePaths.Contains(path);
+    internal static bool OwnsAny => ScenePaths.Count > 0;
     internal static string LoadedManifestSha256 { get; private set; } = "";
 
     // EFT's callback consumes increments in scene units, not an absolute percentage.

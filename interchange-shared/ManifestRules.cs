@@ -100,6 +100,30 @@ public static class ManifestRules
             throw new InvalidDataException("Missing or mismatched payload: " + file.Path);
     }
 
+    // zzap: the server database json (locations, items) is meant to be tweakable. An edited file used to fail
+    // VerifyFile, the server never became ready and the game could not start. An edited .json now only warns;
+    // a missing file or a changed non-json payload still fails. Checked files are remembered by size and write
+    // time so the 24 MB looseLoot.json is not hashed again on every capability request.
+    private static readonly Dictionary<string, (long Length, DateTime Written, string Expected)> CheckedServerFiles =
+        new Dictionary<string, (long Length, DateTime Written, string Expected)>(StringComparer.OrdinalIgnoreCase);
+
+    public static void VerifyServerFile(string root, PayloadFile file)
+    {
+        var path = Resolve(root, file.Path);
+        var info = new FileInfo(path);
+        if (!info.Exists) throw new InvalidDataException("Missing payload: " + file.Path);
+        var stamp = (info.Length, info.LastWriteTimeUtc, file.Sha256 + "/" + file.Bytes);
+        lock (CheckedServerFiles)
+            if (CheckedServerFiles.TryGetValue(path, out var known) && known == stamp) return;
+        if (info.Length != file.Bytes || Hash(path) != file.Sha256)
+        {
+            if (!file.Path.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("Missing or mismatched payload: " + file.Path);
+            Console.WriteLine("[Manimal Interchange] " + file.Path + " differs from the shipped file (edited), using it as is.");
+        }
+        lock (CheckedServerFiles) CheckedServerFiles[path] = stamp;
+    }
+
     public static void CheckCapability(ContentManifest manifest, string hash, ServerCapability server, bool probe)
     {
         if (server == null || server.Schema != 1 || !server.Ready || server.ModVersion != ModIdentity.Version

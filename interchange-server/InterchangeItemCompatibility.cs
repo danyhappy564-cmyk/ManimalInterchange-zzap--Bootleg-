@@ -60,7 +60,7 @@ public static class InterchangeItemCompatibility
         ArgumentNullException.ThrowIfNull(json);
         ArgumentNullException.ThrowIfNull(declaration);
 
-        ManifestRules.VerifyFile(root, declaration);
+        ManifestRules.VerifyServerFile(root, declaration);
         var path = ManifestRules.Resolve(root, declaration.Path);
         var text = File.ReadAllText(path);
         var result = json.Deserialize<Dictionary<MongoId, TemplateItem>>(text);
@@ -99,7 +99,7 @@ public static class InterchangeItemCompatibility
         ArgumentNullException.ThrowIfNull(json);
         ArgumentNullException.ThrowIfNull(declaration);
 
-        ManifestRules.VerifyFile(root, declaration);
+        ManifestRules.VerifyServerFile(root, declaration);
         var path = ManifestRules.Resolve(root, declaration.Path);
         var text = File.ReadAllText(path);
         var result = json.Deserialize<Dictionary<string, string>>(text);

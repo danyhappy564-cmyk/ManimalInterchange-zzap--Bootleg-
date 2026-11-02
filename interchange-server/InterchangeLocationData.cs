@@ -43,7 +43,7 @@ public static class InterchangeLocationData
                 throw new InvalidDataException("Missing Interchange database declaration: " + relative);
             }
 
-            ManifestRules.VerifyFile(root, declaration);
+            ManifestRules.VerifyServerFile(root, declaration);
 
             var text = File.ReadAllText(ManifestRules.Resolve(root, relative));
             using var document = JsonDocument.Parse(text);

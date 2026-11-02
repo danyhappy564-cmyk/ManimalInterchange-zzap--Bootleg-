@@ -38,12 +38,12 @@ public sealed class InterchangeCapabilityRouter(JsonUtil jsonUtil) : StaticRoute
             // SceneLoader.
             foreach (var file in manifest.ServerFiles)
             {
-                ManifestRules.VerifyFile(root, file);
+                ManifestRules.VerifyServerFile(root, file);
             }
 
             foreach (var file in manifest.ItemFiles)
             {
-                ManifestRules.VerifyFile(root, file);
+                ManifestRules.VerifyServerFile(root, file);
             }
 
             var currentHash = ManifestRules.Hash(path);

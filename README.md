@@ -1,3 +1,8 @@
+<p align="center">
+  <a href="README.md"><img alt="한국어 (현재 문서)" src="https://img.shields.io/badge/%ED%95%9C%EA%B5%AD%EC%96%B4-%ED%98%84%EC%9E%AC%20%EB%AC%B8%EC%84%9C-1f6feb?style=for-the-badge"></a>
+  <a href="README.en.md"><img alt="English" src="https://img.shields.io/badge/English-Read%20in%20English-6e7681?style=for-the-badge"></a>
+</p>
+
 # Manimal Interchange Rework Backport (zzap 부트렉)
 
 ### ⚠️ IMPORTANT NOTICE / DISCLAIMER
@@ -28,9 +33,7 @@ This build only **overwrites the original Manimal's 1.0 Interchange Expansion Ba
 
 ## 변경 이력 (zzap)
 
-- 2026-11-02 — **db 파일(맵 위치·전리품·아이템 json)을 고치면 서버가 모드를 멈춰 게임이 안 켜지던 것 수정.** 서버가 db 파일마다 원본 지문(SHA-256)을 맞춰 보고 하나라도 다르면 멈췄습니다. 이제 고친 json은 서버 창에 경고 한 줄만 띄우고 그대로 씁니다(파일이 없거나 json이 아닌 파일이 다르면 전처럼 멈춤). 고친 내용은 서버를 다시 켜야 적용됩니다. 검사한 파일은 크기·수정 시각으로 기억해서 looseLoot.json 24MB를 매번 다시 읽지 않습니다.
-- 2026-11-02 — **다른 맵에서 면광원 패치가 아무것도 안 건드리고 바로 빠짐.** 인터체인지 장면을 불러오지 않은 판(연구소 등)에서는 장면 조회도 하지 않습니다. 연구소 실측(이전 수정 포함): 이 패치가 만드는 쓰레기 메모리 1분에 156MB → 0.2MB 이하.
-- 2026-11-02 — **연구소 등 다른 맵에서 메모리 쓰레기 220~250MB/분 수정.** 면광원(AreaLight) 초기화 함수가 면광원마다 매 프레임 불리는데(연구소 약 140개, 분당 70~80만 회), 인터체인지 장면인지 확인하려고 매번 장면 경로 문자열을 두 번 새로 만들었습니다. 이제 '인터체인지 장면이 아님'으로 판정한 장면은 기억해 두고 다시 묻지 않습니다(인터체인지 장면 경로는 그 장면이 로드되기 전에 등록됨). 확인: 빌드 오류 0, 게임 미확인.
+전체 변경 이력 3개는 [`changelog/`](changelog/) 폴더에 10개씩 나눠 있습니다 (번호가 클수록 최신, 최신 파일: [`CHANGELOG-001.md`](changelog/CHANGELOG-001.md)). 릴리즈별 요약은 [Releases](../../releases).
 
 ---
 
